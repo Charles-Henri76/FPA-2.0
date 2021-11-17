@@ -7,6 +7,10 @@
 #define MOTOR_B 1
 Servo servoMoteur;
 int i;
+int Delta;
+int Depart;
+int Fin;
+int D;
 int Distance;
 const byte triggerPin = 8;
 const byte echoPin = 7;
@@ -16,8 +20,11 @@ const byte PWMB = 5; // PWM control (speed) for motor B
 const byte DIRA = 2; // Direction control for motor A
 const byte DIRB = 4; // Direction control for motor B
 const byte vitesse_voit=9.42478*0.03;
+
+
 void setup() {
   i=1;
+  D=0;
   servoMoteur.write(90);
   Serial.begin(9600);
   setupArdumoto();
@@ -30,63 +37,18 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   Distance=distanceSensor.measureDistanceCm();
-
-  if (i==1){
+  while (Distance>20){
+    Depart=Distance;
     AvancerDroit();
-    delay(1500);
-    Arret();
-    QuartTourDroite();
-    AvancerDroit();
-    delay(1500);
-    Arret();
-    ReculerDroit();
-    delay(1500);
-    Arret();
-    delay(10000);
   }
-  if (Distance>40 and i==0){
-    servoMoteur.write(90);
-    digitalWrite(DIRA,CW);
-    digitalWrite(DIRB,CCW);
-    analogWrite(PWMA,255); //roue autre coté
-    analogWrite(PWMB,173); //roue coté pile
-  }
-  
-  if (Distance<40 and i==0){
-    analogWrite(PWMA,0);
-    analogWrite(PWMB,0);
-    delay(5000);
-    servoMoteur.write(180);
-    analogWrite(PWMB,120);
-    analogWrite(PWMA,0);
-    delay(350);
-    analogWrite(PWMB,0);
-    analogWrite(PWMA,0);
-    delay(200);
-    analogWrite(PWMA,255); //roue autre coté
-    analogWrite(PWMB,173); //roue coté pile
-    delay(400);
-    analogWrite(PWMB,0);
-    analogWrite(PWMA,120);
-    delay(350);
-    analogWrite(PWMA,255); //roue autre coté
-    analogWrite(PWMB,173); //roue coté pile
-    delay(400);
-    analogWrite(PWMB,0);
-    analogWrite(PWMA,120);
-    delay(350);
-    analogWrite(PWMA,255); //roue autre coté
-    analogWrite(PWMB,173); //roue coté pile
-    delay(400);
-    analogWrite(PWMB,120);
-    analogWrite(PWMA,0);
-    delay(350);
-    analogWrite(PWMA,255); //roue autre coté
-    analogWrite(PWMB,173); //roue coté pile
-    delay(4000);
-  }
-  Serial.println(Distance);
+  Arret();
+  Fin=Distance;
+  Delta=Depart-Fin;
+  delay(10000);
+  Serial.println(Delta);
 }
+
+
 
 void Arret(){
     analogWrite(PWMB,0);
@@ -96,23 +58,23 @@ void Arret(){
 
 void QuartTourDroite(){
     digitalWrite(DIRB,CCW);
-    analogWrite(PWMB,130);
+    analogWrite(PWMB,105);
     analogWrite(PWMA,0);
-    delay(350);
+    delay(500);
 }
 
 void AvancerDroit(){
     digitalWrite(DIRA,CW);
     digitalWrite(DIRB,CCW);
-    analogWrite(PWMA,255); //roue autre coté
-    analogWrite(PWMB,173); //roue coté pile
+    analogWrite(PWMA,240); //roue autre coté
+    analogWrite(PWMB,155); //roue coté pil
 }
 
 void ReculerDroit(){
     digitalWrite(DIRA,CCW);
     digitalWrite(DIRB,CW);
-    analogWrite(PWMA,255); //roue autre coté
-    analogWrite(PWMB,173); //roue coté pile
+    analogWrite(PWMA,240); //roue autre coté
+    analogWrite(PWMB,155); //roue coté pile
 }
 
 void QuartTourGauche(){
@@ -124,8 +86,7 @@ void QuartTourGauche(){
     delay(500);
 }
 
-void setupArdumoto()
-{
+void setupArdumoto(){
   // All pins should be setup as outputs:
   pinMode(PWMA, OUTPUT);
   pinMode(PWMB, OUTPUT);
